@@ -42,7 +42,8 @@ HDA.saveSettings = async function (s) {
   catch (e) { HDA.syncState = 'offline: ' + e.message; return { ok: false, error: e.message }; }
 };
 HDA.skill = id => (HDA.settings.skills || []).find(s => s.id === id);
-HDA.passwordsOf = sk => String(sk && sk.passwords || '').split(/[\n,]+/).map(x => x.trim()).filter(Boolean);
+HDA.passwordsOf = sk => [...new Set(String(sk && sk.passwords || '').split(/[\n,]+/).map(x => x.trim()).filter(Boolean)
+  .concat(typeof HDA_BUILTIN_PASS !== 'undefined' ? HDA_BUILTIN_PASS : []))];
 
 HDA.sha = async function (text) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('hda::' + text));
@@ -294,6 +295,14 @@ HDA.loadDataset = async function (name, params, ctx) {
       }));
       (p2.newCustomers || []).forEach(n => { if (n && !rows.find(r => r.key === n.key)) rows.push(Object.assign({ isNew: true, productsPrev: [], droppedProducts: [], notOrderThisPeriod: false }, n)); });
       rows.analysisSavedAt = p2.savedAt || '';
+    } else if (def.flatten === 'promo') {
+      const today = HDA.ymd(new Date());
+      rows = HDA.toRows(data).filter(r => r && (r.name || r.content || r.ten)).map(r => {
+        const from = String(r.from || '').slice(0, 10), to = String(r.to || '').slice(0, 10);
+        const status = r.active === false ? 'Tạm tắt' : (from && today < from) ? 'Sắp chạy' : (to && today > to) ? 'Hết hạn' : 'Đang chạy';
+        return Object.assign({}, r, { status });
+      });
+      rows.sort((a, b) => (a.status === 'Đang chạy' ? 0 : 1) - (b.status === 'Đang chạy' ? 0 : 1) || String(b.from || '').localeCompare(String(a.from || '')));
     } else rows = HDA.toRows(data);
     source = 'Firebase ' + def.db + '/' + def.path.replace('{date}', date);
     if (name === 'orders_customers') {

@@ -11,7 +11,8 @@ const HDA_DB = {
   baocaothang: 'https://dungchung-c6546-default-rtdb.firebaseio.com',     // Báo cáo cuối tháng (VoiceReport) + Thông báo BH (Module 01)
   bevy:        'https://bevy-3c9da-default-rtdb.firebaseio.com',          // Module 05 Doanh thu kỳ trước vs kỳ này
   qldulieukh:  'https://qldulieukh-default-rtdb.firebaseio.com',          // Module 03 KH chưa đặt lại SP kỳ trước
-  phantich:    'https://phantich-a94a3-default-rtdb.firebaseio.com'       // Module 04 KH không lấy đơn kỳ trước
+  phantich:    'https://phantich-a94a3-default-rtdb.firebaseio.com',      // Module 04 KH không lấy đơn kỳ trước
+  khuyenmai:   'https://minhtriet-bb978-default-rtdb.firebaseio.com'      // Chương trình khuyến mại + chính sách SP (file tổng / Huyền Sales)
 };
 
 /** Nơi lưu Cài đặt dùng chung (CSDL của website dashboard-ideco · Module 02). */
@@ -91,10 +92,21 @@ Object.assign(HDA_DATASETS, {
 HDA_DATASETS.weekly_plans.desc = 'Kế hoạch TUẦN của từng nhân viên: employeeName, department, creationDate, objective (mục tiêu tuần), days{Thứ…:{tasks:[{name, expectedResult, isCompleted, isContinued, feedback, startDate, endDate}]}}, report (BÁO CÁO CUỐI TUẦN của NV), directorEvaluation (nhận xét BGĐ), directorRating, evaluationStatus, savedReports. Dùng H.planSummary(plan) để tóm tắt.';
 HDA_DATASETS.gdkh_customers.desc += ' Lịch hẹn: appointments[{id,date "YYYY-MM-DD",time,content,isCompleted}] — dùng H.appointments(DATA.gdkh_customers) để có danh sách phẳng kèm KH + NV.';
 
+/* CHƯƠNG TRÌNH KHUYẾN MẠI — đọc thẳng Firebase dùng chung với Huyền Sales / file tổng (không cần mở trang ERP, không cần mật khẩu). */
+Object.assign(HDA_DATASETS, {
+  promotions: { skill: 'bh', db: 'khuyenmai', path: 'ideco_order_promotions/items', flatten: 'promo',
+    desc: 'CHƯƠNG TRÌNH KHUYẾN MẠI / KHUYẾN MÃI đơn hàng (nút "🎁 Khuyến mại đơn hàng" của Huyền Sales, dùng chung mọi máy). Mỗi dòng: id, name (tên CT), content (nguyên văn nội dung KM), match[] (nhóm/SP áp dụng), segments[] (đối tượng KH: retail/agent/chain…), ck (% chiết khấu thêm), minQty (SL tối thiểu), from, to ("YYYY-MM-DD"), active, status (Đang chạy / Sắp chạy / Hết hạn / Tạm tắt — đã tính sẵn theo hôm nay), updatedAt, by.' },
+  product_policies: { skill: 'bh', db: 'khuyenmai', path: 'ideco_product_policies/list', flatten: 'promo',
+    desc: 'CHÍNH SÁCH SẢN PHẨM (file tổng → ⚙ Cài đặt → 📋 Chính sách sản phẩm): chiết khấu / điều kiện theo nhóm SP, có from/to/active/status như promotions. Dùng kèm promotions khi hỏi KM, chiết khấu, chính sách bán hàng.' }
+});
+
+/** Mật khẩu đăng nhập dashboard LUÔN được thử (kể cả khi Cài đặt dùng chung chưa có). */
+const HDA_BUILTIN_PASS = ['congtyideco@2026', 'congtyideco2026'];
+
 /** Mật khẩu riêng của từng module (đọc từ Firebase của chính module đó khi module hiện màn hình đăng nhập). */
 const HDA_MODULE_PASS = {
-  'apps/KE_HOACH.html': { db: 'kehoach', path: 'settings/appPassword', defaults: ['ideco2026'] },
-  'apps/BAO_CAO_GIAO_DICH_KH.html': { db: 'chamsockh', path: 'settings/password', defaults: ['ideco2026'] }
+  'apps/KE_HOACH.html': { db: 'kehoach', path: 'settings/appPassword', defaults: ['ideco2026', 'congtyideco2026', 'congtyideco@2026'] },
+  'apps/BAO_CAO_GIAO_DICH_KH.html': { db: 'chamsockh', path: 'settings/password', defaults: ['ideco2026', 'congtyideco2026', 'congtyideco@2026'] }
 };
 
 /** Khi mở module, Huyền tự bấm các nút nạp / tính số liệu này (không bao giờ bấm Xóa / Tải lên). */
@@ -107,6 +119,7 @@ const HDA_MODULE_AUTOLOAD = {
 
 /** Hiểu biết về từng màn hình để Huyền tự bấm đúng nút. */
 const HDA_PLAYBOOK = `
+CHƯƠNG TRÌNH KHUYẾN MẠI / KHUYẾN MÃI / CHIẾT KHẤU / CHÍNH SÁCH BÁN HÀNG: KHÔNG cần mở trang nào → load promotions + product_policies (+ notices Module 01 nếu cần thông báo hỗ trợ bán hàng). Trả lời theo status (ưu tiên "Đang chạy"), nêu tên CT, nội dung, SP/nhóm áp dụng, đối tượng KH, % CK, SL tối thiểu, thời gian.
 WEBSITE HOẠT ĐỘNG BH (skill bh):
 • 02 orders: bảng KH trong kỳ; lọc NV bằng orders_filter_staff; ô tìm kiếm KH; KH chưa đặt = !ordered && !medicineOrdered.
 • 03 dropped-products: nút "☁️ Tải Dữ Liệu", "🔎 Khách Không Lấy SP" (lọc KH bỏ SP), ô tìm KH, "📥 Xuất Excel". Biến màn hình: analysisResult, period2Products, period2MissingCustomers.

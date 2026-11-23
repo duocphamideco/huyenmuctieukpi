@@ -207,17 +207,36 @@
       btn.classList.add('on'); btn.textContent = '⏺'; rec.start();
     });
   })();
-  /* ---------------- GỢI Ý CÀI LÊN MÀN HÌNH CHÍNH ---------------- */
+  /* ---------------- CÀI ỨNG DỤNG (có logo) ---------------- */
   (function () {
     const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
     if (standalone) return;
-    try { if (localStorage.getItem('hdam:tipHidden')) return; } catch (e) {}
-    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const ua = navigator.userAgent;
+    const ios = /iphone|ipad|ipod/i.test(ua);
+    const inApp = /Zalo|FBAN|FBAV|FB_IAB|Instagram|Line\/|TikTok|; wv\)/i.test(ua);
+    const iosNotSafari = ios && /CriOS|FxiOS|EdgiOS|Zalo|FBAN|FBAV/i.test(ua);
     const tip = document.createElement('div'); tip.className = 'install-tip';
-    tip.innerHTML = ios ? '📲 Cài Huyền lên màn hình chính: bấm nút <b>Chia sẻ</b> ⬆️ của Safari → <b>Thêm vào MH chính</b>. <a href="#" class="tipX">Ẩn</a>'
-      : '📲 Cài Huyền như ứng dụng: bấm <b>⋮</b> của Chrome → <b>Cài đặt ứng dụng / Thêm vào Màn hình chính</b>. <a href="#" class="tipX">Ẩn</a>';
-    document.getElementById('view-chat').insertBefore(tip, document.getElementById('msgs'));
-    tip.querySelector('.tipX').addEventListener('click', e => { e.preventDefault(); tip.remove(); try { localStorage.setItem('hdam:tipHidden', '1'); } catch (x) {} });
+    const box = () => { if (!tip.isConnected) document.getElementById('view-chat').insertBefore(tip, document.getElementById('msgs')); };
+    if (inApp || iosNotSafari) {
+      tip.innerHTML = '⚠️ Đang mở trong trình duyệt của ' + (/Zalo/i.test(ua) ? 'Zalo' : 'ứng dụng khác') + ' nên khi cài sẽ <b>không có logo</b>. Bấm <b>⋯ / ⋮</b> → <b>Mở bằng ' + (ios ? 'Safari' : 'Chrome') + '</b>, rồi cài lại.';
+      box(); return;
+    }
+    let deferred = null;
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault(); deferred = e;
+      tip.innerHTML = '📲 Cài <b>Huyền AI-KPI-QLKH</b> như ứng dụng (có logo IDECO trên màn hình chính). <button class="primary" id="installBtn">Cài đặt</button>';
+      box();
+      tip.querySelector('#installBtn').addEventListener('click', async () => { deferred.prompt(); const r = await deferred.userChoice.catch(() => ({})); if (r && r.outcome === 'accepted') tip.remove(); deferred = null; });
+    });
+    window.addEventListener('appinstalled', () => tip.remove());
+    try { if (localStorage.getItem('hdam:tipHidden')) return; } catch (e) {}
+    setTimeout(() => {
+      if (deferred || tip.isConnected) return;
+      tip.innerHTML = ios ? '📲 Cài Huyền lên màn hình chính: bấm nút <b>Chia sẻ</b> ⬆️ của Safari → <b>Thêm vào MH chính</b>. <a href="#" class="tipX">Ẩn</a>'
+        : '📲 Cài Huyền: bấm <b>⋮</b> của Chrome → <b>Cài đặt ứng dụng</b> (nếu chỉ thấy "Thêm vào MH chính" thì chờ vài giây, tải lại trang rồi thử lại). <a href="#" class="tipX">Ẩn</a>';
+      box();
+      const x = tip.querySelector('.tipX'); if (x) x.addEventListener('click', e => { e.preventDefault(); tip.remove(); try { localStorage.setItem('hdam:tipHidden', '1'); } catch (y) {} });
+    }, 2500);
   })();
 
   /** Chạy 1 câu hỏi qua Huyền. opts: {display, fresh (không kèm lịch sử), label} → trả kết quả hoặc null */

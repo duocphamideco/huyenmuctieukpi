@@ -45,6 +45,12 @@ const HDA_TEMPLATES = [
   { id: 'dh6', group: '🛒 Khách hàng & đơn hàng', skill: 'bh', title: 'KH bỏ sản phẩm cũ của 1 NV', need: ['NV'],
     text: 'Liệt kê khách hàng của {NV} đã mua kỳ trước nhưng kỳ này bỏ sản phẩm (hoặc chưa đặt gì): tên KH, SĐT, sản phẩm bỏ, sản lượng kỳ trước.{EXCEL}' },
 
+  /* ---------- KHUYẾN MẠI ---------- */
+  { id: 'km1', group: '🎁 Khuyến mại & chính sách', skill: 'bh', title: 'Chương trình khuyến mại đang chạy', need: [],
+    text: 'Liệt kê các chương trình khuyến mại / chính sách sản phẩm ĐANG CHẠY hôm nay: tên chương trình, sản phẩm/nhóm áp dụng, đối tượng khách hàng, % chiết khấu, số lượng tối thiểu, thời gian bắt đầu – kết thúc; kèm các chương trình sắp chạy.{EXCEL}' },
+  { id: 'km2', group: '🎁 Khuyến mại & chính sách', skill: 'bh', title: 'KM áp dụng cho 1 khách hàng', need: ['KH'],
+    text: 'Khách hàng {KH} hiện được hưởng những chương trình khuyến mại / chính sách nào (theo đối tượng KH và sản phẩm KH hay lấy kỳ trước)? Gợi ý sản phẩm nên chào kèm khuyến mại.' },
+
   /* ---------- DOANH THU ---------- */
   { id: 'dt1', group: '💰 Doanh thu kỳ này vs kỳ trước', skill: 'bh', title: 'Doanh thu theo NV: kỳ này vs kỳ trước', need: [],
     text: 'So sánh doanh thu kỳ này với kỳ trước theo từng nhân viên: kỳ này, kỳ trước, chênh lệch, % tăng giảm, tách thuốc / không thuốc; nêu tổng công ty, nhân viên tăng mạnh nhất và giảm mạnh nhất. Mở Module 05 cho tôi xem.{EXCEL}' },

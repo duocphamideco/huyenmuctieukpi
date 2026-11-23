@@ -1,4 +1,4 @@
-# HUYỀN QUẢN LÝ KPI - KHÁCH HÀNG · bản điện thoại (v1.0.1)
+# HUYỀN QUẢN LÝ KPI - KHÁCH HÀNG · bản điện thoại (v1.0.3)
 
 Ứng dụng web cài lên màn hình chính (PWA), chạy trên **Chrome Android** và **Safari iPhone/iPad**.
 Dùng chung lõi với bản máy tính (Huyền KPI 1.5.0 trong IDECO SUITE).
