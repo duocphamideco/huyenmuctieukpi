@@ -1,11 +1,13 @@
-# HUYỀN QUẢN LÝ KPI - KHÁCH HÀNG · bản điện thoại (v1.0.3)
+# HUYỀN QUẢN LÝ KPI - KHÁCH HÀNG · bản điện thoại (v1.0.4)
 
 Ứng dụng web cài lên màn hình chính (PWA), chạy trên **Chrome Android** và **Safari iPhone/iPad**.
 Dùng chung lõi với bản máy tính (Huyền KPI 1.5.0 trong IDECO SUITE).
 
 ## 1. Đưa lên GitHub Pages (làm 1 lần)
 1. Trên GitHub tài khoản **duocphamideco**, tạo kho mới tên **`huyenkpi`** (Public).
-2. Bấm **Add file → Upload files**, kéo toàn bộ NỘI DUNG thư mục `huyenkpi` vào: `index.html`, `app.js`, `app.css`, … cùng 2 thư mục `lib/` và `icons/`. Sau đó bấm **Commit changes**.
+2. Bấm **Add file → Upload files** → **choose your files** → chọn **TẤT CẢ 25 file** trong thư mục `huyenkpi` (từ v1.0.4 không còn thư mục con, logo nằm ngay cạnh `index.html`). Bấm **Commit changes**.
+   - Bản cũ có thư mục `icons/` và `lib/`: nếu chỉ chọn file thì GitHub BỎ QUA thư mục con → thiếu logo → Chrome cài ra chữ "H". Đây là nguyên nhân thường gặp nhất.
+   - Kiểm tra: mở https://duocphamideco.github.io/huyenkpi/huyenkpi-icon-512.png phải thấy logo. Nếu thiếu file, khi mở app sẽ hiện khung đỏ "Thiếu file logo trên GitHub".
 3. Vào **Settings → Pages**. Ở mục Source chọn **Deploy from a branch → main → / (root)**, rồi bấm **Save**.
 4. Chờ 1–2 phút, rồi mở **https://duocphamideco.github.io/huyenkpi/**
 
@@ -13,6 +15,8 @@ Dùng chung lõi với bản máy tính (Huyền KPI 1.5.0 trong IDECO SUITE).
 
 ## 2. Cài lên điện thoại
 - **Android (Chrome):** mở link → bấm **⋮** → **Cài đặt ứng dụng / Thêm vào Màn hình chính**.
+- **Đã cài bản cũ ra chữ "H":** (1) nhấn giữ biểu tượng cũ → **Gỡ cài đặt / Xóa**; (2) Chrome → **⋮ → Cài đặt → Cài đặt trang web → Tất cả trang web → duocphamideco.github.io → Xóa dữ liệu**; (3) đóng hẳn Chrome, mở lại link, chờ 5 giây, rồi mới bấm **⋮ → Cài đặt ứng dụng**.
+- Phải mở bằng **Chrome** (không mở từ Zalo / Facebook, vì trình duyệt trong app không cài được logo).
 - **iPhone (Safari):** mở link → bấm nút **Chia sẻ ⬆️** → **Thêm vào MH chính**.
 Biểu tượng logo IDECO xuất hiện trên màn hình chính, mở ra toàn màn hình như app thật.
 

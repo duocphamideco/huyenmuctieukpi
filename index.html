@@ -9,11 +9,11 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Huyền KPI">
 <meta name="description" content="HUYỀN QUẢN LÝ KPI - KHÁCH HÀNG · IDECO – trợ lý AI trên điện thoại">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
-<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
-<link rel="shortcut icon" href="icons/icon-192.png">
+<link rel="manifest" href="manifest.webmanifest?v=103">
+<link rel="icon" type="image/png" sizes="32x32" href="huyenkpi-favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="huyenkpi-icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="shortcut icon" href="huyenkpi-icon-192.png">
 <title>HUYỀN QUẢN LÝ KPI - KHÁCH HÀNG</title>
 <link rel="stylesheet" href="app.css">
 </head>
@@ -21,7 +21,7 @@
 <!-- ============================ ĐĂNG NHẬP ỨNG DỤNG ============================ -->
 <div id="loginGate" class="gate" hidden>
   <form id="loginForm" class="gate-card" autocomplete="off">
-    <img src="icons/icon-512.png" alt="IDECO Huyền AI-KPI-QLKH" class="gate-logo app-logo">
+    <img src="huyenkpi-icon-512.png" alt="IDECO Huyền AI-KPI-QLKH" class="gate-logo app-logo">
     <h2>HUYỀN QUẢN LÝ KPI - KHÁCH HÀNG</h2>
     <p class="muted">IDECO · Hoạt động BH · Mục tiêu KPI</p>
     <label class="lbl">Mật khẩu
@@ -34,7 +34,7 @@
 </div>
 
 <header class="top">
-  <span class="logo"><img src="icons/logo-ideco.png" alt="IDECO"></span>
+  <span class="logo"><img src="logo-ideco.png" alt="IDECO"></span>
   <div class="brand"><b>HUYỀN QUẢN LÝ KPI - KH</b><small>IDECO · Hoạt động BH · Mục tiêu KPI · Khách hàng</small></div>
   <nav class="tabs" role="tablist">
     <button class="tab active" data-view="chat" role="tab">Chat</button>
@@ -186,7 +186,7 @@
 <div id="screens" class="screens" aria-hidden="true"></div>
 
 <script src="shim.js"></script>
-<script src="lib/xlsx.full.min.js"></script>
+<script src="xlsx.full.min.js"></script>
 <script src="config.js"></script>
 <script src="templates.js"></script>
 <script src="core.js"></script>
@@ -194,6 +194,21 @@
 <script src="mobile-bridge.js"></script>
 <script src="app.js"></script>
 <script>
+  // Tự kiểm tra logo: thiếu file trên GitHub → Chrome cài ra chữ "H" thay vì logo IDECO
+  window.addEventListener('load', () => {
+    if (matchMedia('(display-mode: standalone)').matches || navigator.standalone) return;
+    const t = '?v=' + Date.now();
+    fetch('manifest.webmanifest' + t, { cache: 'no-store' }).then(r => r.ok ? r.json() : Promise.reject(new Error('manifest.webmanifest')))
+      .then(m => Promise.all((m.icons || []).concat([{ src: 'apple-touch-icon.png' }]).map(ic => fetch(ic.src + t, { cache: 'no-store' }).then(r => r.ok ? null : ic.src, () => ic.src))))
+      .then(x => x.filter(Boolean), e => [String(e.message || e)])
+      .then(miss => {
+        if (!miss.length) return;
+        const w = document.createElement('div'); w.id = 'logoCheck';
+        w.style.cssText = 'position:fixed;left:8px;right:8px;top:8px;z-index:99999;background:#fff1f0;border:2px solid #ee3a23;color:#a8071a;border-radius:12px;padding:12px;font:15px/1.45 system-ui';
+        w.innerHTML = '⚠️ <b>Thiếu file logo trên GitHub</b> nên khi cài sẽ KHÔNG có logo: ' + miss.map(x => '<code>' + x + '</code>').join(', ') + '.<br>Upload đủ các file vào kho <b>huyenkpi</b> (không để trong thư mục con), rồi tải lại trang. <a href="#" style="color:#a8071a" onclick="this.parentNode.remove();return false">Ẩn</a>';
+        document.body.appendChild(w);
+      });
+  });
   if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 </script>
 </body>
