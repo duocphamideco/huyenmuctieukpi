@@ -480,7 +480,8 @@
     if (!box.children.length) box.innerHTML = '<p class="muted">Không có mẫu phù hợp.</p>';
   }
   function tplValues() {
-    return { NV: $('#tplNV').value.trim(), KH: $('#tplKH').value.trim(), KY: kyText(), TUAN: tuanText(), EXCEL: $('#tplExcel').checked };
+    return { NV: $('#tplNV').value.trim(), KH: $('#tplKH').value.trim(), KY: kyText(), TUAN: tuanText(), EXCEL: $('#tplExcel').checked,
+      SP: $('#tplSP').value.trim(), NHOM: $('#tplNHOM').value.trim(), MUC: $('#tplMUC').value, MSG: $('#tplMSG').value.trim() };
   }
   function updatePreview() {
     if (!tplCur) return;
@@ -511,6 +512,14 @@
       } catch (e) {}
     }
     $('#tplNVList').innerHTML = [...nv].sort((a, b) => a.localeCompare(b, 'vi')).map(n => '<option value="' + esc(n) + '">').join('');
+    if (HDA.quote) {
+      try {
+        const cs = await HDA.quote.loadCustomers(); cs.forEach(c => { if (kh.size < 1500) kh.add(c.ten); });
+        const ps = HDA.quote._st.products.length ? HDA.quote._st.products : (await HDA.quote.refresh(true).catch(() => null), HDA.quote._st.products);
+        $('#tplSPList').innerHTML = ps.map(p => '<option value="' + esc(p.name) + '">').join('');
+        $('#tplNHOMList').innerHTML = [...new Set(ps.map(p => p.category).filter(Boolean))].map(n => '<option value="' + esc(n) + '">').join('');
+      } catch (e) {}
+    }
     $('#tplKHList').innerHTML = [...kh].sort((a, b) => a.localeCompare(b, 'vi')).map(n => '<option value="' + esc(n) + '">').join('');
   }
   let namesLoaded = false;
@@ -521,12 +530,18 @@
   $('#tplClose').addEventListener('click', () => { $('#tplPanel').hidden = true; });
   $('#tplSearch').addEventListener('input', renderTplList);
   $('#tplBack').addEventListener('click', closeTplForm);
-  ['#tplNV', '#tplKH', '#tplKY', '#tplFrom', '#tplTo', '#tplTUAN', '#tplWeekDate', '#tplExcel'].forEach(sel => {
+  // 📎 chọn tệp ngay trong mẫu "gửi file bảng giá"
+  $('#tplAttBtn').addEventListener('click', () => { const i = document.getElementById('attInput'); if (i) i.click(); });
+  setInterval(() => { const el = $('#tplAttInfo'); if (el && HDA.attach && !$('#tplPanel').hidden) { const p = HDA.attach.pending(); el.textContent = p.length ? '✅ ' + p.map(f => f.name).join(', ') : 'Chưa chọn tệp'; } }, 700);
+  ['#tplNV', '#tplKH', '#tplKY', '#tplFrom', '#tplTo', '#tplTUAN', '#tplWeekDate', '#tplExcel', '#tplSP', '#tplNHOM', '#tplMUC', '#tplMSG'].forEach(sel => {
     $(sel).addEventListener('input', updatePreview); $(sel).addEventListener('change', updatePreview);
   });
   function applyTpl(send) {
     if (!tplCur) return;
     if ((tplCur.need || []).includes('KH') && !$('#tplKH').value.trim()) { $('#tplKH').focus(); $('#tplKH').placeholder = '⚠ Nhập tên khách hàng'; return; }
+    if ((tplCur.need || []).includes('SP') && !$('#tplSP').value.trim()) { $('#tplSP').focus(); $('#tplSP').placeholder = '⚠ Nhập tên sản phẩm'; return; }
+    if ((tplCur.need || []).includes('NHOM') && !$('#tplNHOM').value.trim()) { $('#tplNHOM').focus(); $('#tplNHOM').placeholder = '⚠ Nhập nhóm / danh mục'; return; }
+    if ((tplCur.need || []).includes('ATT') && HDA.attach && !HDA.attach.pending().length) { alert('Hãy bấm 📎 Chọn tệp bảng giá trước.'); return; }
     const text = hdaFillTemplate(tplCur, tplValues());
     if (tplCur.skill && tplCur.skill !== state.skill && HDA.skill(tplCur.skill)) { state.skill = tplCur.skill; saveChat(); renderSkills(); }
     $('#tplPanel').hidden = true;

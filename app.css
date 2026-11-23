@@ -154,3 +154,51 @@ body.show-screen .screens{transform:none}
 .file button{margin-left:6px;border:1px solid #065f46;background:#fff;color:#065f46;border-radius:8px;padding:4px 8px;font-size:13px}
 .install-tip{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:10px;padding:8px 10px;font-size:13.5px;margin:6px 12px}
 .gate-logo.app-logo{width:150px;border-radius:30px;box-shadow:0 6px 20px rgba(0,0,0,.15)}
+
+/* ================= 💰 GỬI BÁO GIÁ (v1.0.5) ================= */
+#view-quote{overflow:auto}
+.qt-wrap{display:flex;flex-direction:column;gap:10px;padding:10px 12px 90px}
+.qt-head .row b{font-size:16px;color:var(--red)}
+.qt-badge{font-weight:600;font-size:13px;color:var(--mut);margin-left:6px}
+.qt-filter input,.qt-filter select,.qt-input{border:1px solid var(--line);border-radius:10px;padding:9px 10px;background:#fff;min-width:0;width:100%}
+.qt-filter select{flex:0 0 38%}
+.qt-mini{margin:8px 0}.qt-mini button{font-size:13px;padding:5px 9px}
+.qt-list{max-height:46vh;overflow:auto;border:1px solid var(--line);border-radius:10px;background:#fafbfc}
+.qt-row{display:flex;gap:10px;align-items:center;padding:10px;border-bottom:1px solid var(--line);background:#fff;cursor:pointer}
+.qt-row.on{background:#fff6f4}
+.qt-row input{width:22px;height:22px;accent-color:var(--red);flex:none}
+.qt-name{flex:1;min-width:0}.qt-name b{display:block;font-size:14.5px;line-height:1.3}.qt-name small{color:var(--mut);font-size:12px}
+.qt-price{font-weight:700;color:var(--red);font-size:13.5px;white-space:nowrap}
+.qt-seg{display:flex;background:#f1f2f6;border-radius:12px;padding:3px;gap:3px}
+.qt-seg button{flex:1;border:0;background:transparent;border-radius:10px;padding:10px 6px;font-weight:700;font-size:14px;cursor:pointer;color:#374151}
+.qt-seg button.on{background:var(--red);color:#fff;box-shadow:0 2px 8px #ee3a2340}
+.qt-custs{display:flex;flex-direction:column;gap:6px;margin:6px 0;max-height:40vh;overflow:auto}
+.qt-cust{text-align:left;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 10px;cursor:pointer}
+.qt-cust b{display:block;font-size:14.5px}.qt-cust small{color:var(--mut);font-size:12.5px}
+.qt-picked{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;border:1.5px solid var(--ok);background:#ecfdf5;border-radius:10px;padding:9px 10px;margin:6px 0}
+.qt-picked b{flex:1 1 70%}.qt-picked small{flex:1 1 100%;order:3;color:#065f46}.qt-picked button{padding:2px 8px}
+.qt-actions .row{margin-top:8px}.qt-actions .row button{flex:1 1 30%;min-height:44px}
+.qt-file{margin-top:8px;font-size:13.5px;color:#065f46}
+.qt-chat-card{flex-wrap:wrap}.qt-chat-card button{padding:5px 10px}
+.quote-site{position:fixed;left:0;right:0;bottom:0;top:var(--screen-top,64px);width:100%;height:calc(100% - var(--screen-top,64px));border:0;z-index:6;background:#fff;transform:translateX(-200vw)}
+body.show-quote-site .quote-site{transform:none;top:0;height:100%;z-index:60}
+.qt-site-close{position:fixed;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:61;padding:12px;border-radius:14px;box-shadow:0 8px 24px #0004}
+.qt-site-close[hidden]{display:none}
+.tabs{flex-wrap:nowrap}.tab{white-space:nowrap}
+@media (max-width:420px){.brand small{display:none}.tab{padding:7px 8px;font-size:13px}}
+@media (max-width:480px){.brand b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.top{gap:8px;padding:8px 10px}.logo{width:34px;height:34px}.tab{padding:6px 8px;font-size:13px}}
+
+/* 📎 đính kèm + ⏰ giờ chat tự do */
+.att-chips{display:flex;flex-wrap:wrap;gap:6px}
+.att-chips[hidden]{display:none}
+.att-chip{display:inline-flex;align-items:center;gap:4px;background:#f1f5f9;border:1px solid var(--line);border-radius:999px;padding:4px 6px 4px 10px;font-size:13px;max-width:100%}
+.att-chip button{border:0;background:#e2e8f0;border-radius:50%;width:22px;height:22px;cursor:pointer;line-height:1}
+.att-line{font-size:12.5px;opacity:.9;margin-top:4px;border-top:1px dashed #ffffff80;padding-top:4px}
+.composer.drag{outline:2px dashed var(--red);outline-offset:-4px}
+#attBtn{font-size:18px;padding:4px 10px}
+.fc-badge{display:block;margin:2px 12px 0;font-size:12.5px;border-radius:999px;padding:4px 10px;width:max-content;max-width:calc(100% - 24px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc-badge.on{background:#ecfdf5;color:#065f46}.fc-badge.off{background:#fff7ed;color:#9a3412}
+.fc-days{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.fc-days label{display:inline-flex}.fc-days input{display:none}
+.fc-days span{border:1.5px solid var(--line);border-radius:10px;padding:7px 11px;font-weight:700;cursor:pointer;background:#fff}
+.fc-days input:checked+span{background:var(--red);border-color:var(--red);color:#fff}

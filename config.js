@@ -156,6 +156,13 @@ const HDA_DEFAULT_SETTINGS = {
     showSteps: true
   },
   extraGuide: '',
+  quote: {                               // 💰 Gửi báo giá (lấy từ HUYỀN MARKETING 2)
+    url: 'https://duocphamideco.github.io/bangbaogia/',
+    passwords: 'congtyideco@2026, congtyideco2026',   // mật khẩu "Cài đặt 2" của website báo giá
+    custDb: 'https://thauam1-8ad89-default-rtdb.firebaseio.com',
+    custPath: 'TAOANH_CONTROL/mktAgentCustomers',
+    tpl: 'Kính gửi {lienhe} – {ten},\nIDECO xin gửi {xungho} báo giá thuốc mới nhất. Cần tư vấn thêm, {xungho} nhắn lại giúp IDECO nhé. Cảm ơn {xungho} đã luôn đồng hành cùng IDECO!'
+  },
   appPassword: 'congtyideco@2026',      // mật khẩu mở ứng dụng HUYỀN DASHBOARD
   settingsPassHash: '',                  // rỗng = dùng mật khẩu Cài đặt mặc định
   updatedAt: 0

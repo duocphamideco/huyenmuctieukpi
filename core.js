@@ -8,12 +8,39 @@ HDA.STORE_KEY = 'hda_settings_v1';
 HDA.CHAT_KEY = 'hda_chat_v1';
 HDA.clone = o => JSON.parse(JSON.stringify(o));
 
+/* ===== GIỜ CHAT TỰ DO (tiết kiệm credit Kie): ngoài giờ chỉ trả lời việc công ty, không gọi AI cho câu hỏi tự do ===== */
+HDA.FREECHAT_DEF = { limit: true, days: [1, 2, 3, 4, 5, 6], from: '07:30', to: '18:00' };
+HDA.DOW = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+HDA.freeChatOpen = function (d) {
+  const c = Object.assign({}, HDA.FREECHAT_DEF, (HDA.settings && HDA.settings.freeChat) || {});
+  if (!c.limit) return true;
+  d = d || new Date();
+  if (!(c.days || []).map(Number).includes(d.getDay())) return false;
+  const m = d.getHours() * 60 + d.getMinutes(), t = s => { const x = String(s || '').split(':'); return (+x[0] || 0) * 60 + (+x[1] || 0); };
+  const a = t(c.from), b = t(c.to);
+  return a <= b ? (m >= a && m < b) : (m >= a || m < b);
+};
+HDA.freeChatText = function () {
+  const c = Object.assign({}, HDA.FREECHAT_DEF, (HDA.settings && HDA.settings.freeChat) || {});
+  const days = [1, 2, 3, 4, 5, 6, 0].filter(x => (c.days || []).map(Number).includes(x)).map(x => HDA.DOW[x]).join(', ') || '(chưa chọn ngày)';
+  return days + ' · ' + c.from + '–' + c.to;
+};
+/** Câu hỏi về công việc công ty (luôn được trả lời) hay chat tự do. */
+HDA.isWorkQuestion = function (q) {
+  const t = ' ' + HDA.norm(q) + ' ';
+  return /doanh (thu|so)|khach|\bkh\b|nhan vien|\bnv\b|kpi|ke hoach|bao cao|don hang|dat hang|len don|ky nay|ky truoc|lich hen|giao dich|khuyen ma|chiet khau|chinh sach|bao gia|bang gia|gui zalo|qua zalo|excel|module|dashboard|san luong|san pham|muc tieu|phan tich (du lieu|so lieu|doanh|ke hoach|khach)|ban giam doc|\bbgd\b|tuan nay|thang nay|hom nay ai|cong no|nha thuoc|quay thuoc|phong kham|skill|ideco|ton kho|xuat file|thong ke|tang truong|khai bao|thong bao ban hang|dinh kem|tep|file/.test(t);
+};
+HDA.freeChatClosedMsg = function () {
+  return '⏰ Ngoài giờ **chat tự do** (mở: ' + HDA.freeChatText() + ') nên Huyền tạm không trả lời câu hỏi chung để tiết kiệm credit AI. Anh/chị vẫn hỏi được mọi việc của công ty: doanh thu, khách hàng, KPI, kế hoạch, lịch hẹn, khuyến mại, báo giá… Có thể đổi giờ ở ⚙️ Cài đặt → Giờ chat tự do.';
+};
+
 HDA.normalizeSettings = function (raw) {
   const s = Object.assign(HDA.clone(HDA_DEFAULT_SETTINGS), raw || {});
   s.skills = Array.isArray(s.skills) ? s.skills : [];
   HDA_DEFAULT_SETTINGS.skills.forEach(d => { if (!s.skills.find(x => x.id === d.id)) s.skills.push(HDA.clone(d)); });
   s.ai = Object.assign(HDA.clone(HDA_DEFAULT_SETTINGS.ai), s.ai || {});
   if (!Array.isArray(s.ai.routes) || !s.ai.routes.length) s.ai.routes = HDA.clone(HDA_DEFAULT_SETTINGS.ai.routes);
+  s.freeChat = Object.assign(HDA.clone(HDA.FREECHAT_DEF), s.freeChat || {});
   return s;
 };
 /** Đọc Cài đặt: bản trên máy trước (mở nhanh), rồi lấy bản dùng chung trên Firebase nếu mới hơn. */
@@ -119,7 +146,10 @@ HDA.callRoute = async function (route, messages, signal) {
   if (route.type === 'codex') {
     // Kie GPT 6.1 Terra: POST /codex/v1/responses (chuẩn OpenAI Responses)
     const sys = messages.filter(m => m.role === 'system').map(m => m.content).join('\n\n');
-    const conv = messages.filter(m => m.role !== 'system').map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content }));
+    const conv = messages.filter(m => m.role !== 'system').map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user',
+      content: (m.images && m.images.length) || (m.pdfs && m.pdfs.length)
+        ? [{ type: 'input_text', text: String(m.content) }].concat((m.images || []).map(u => ({ type: 'input_image', image_url: u })), (m.pdfs || []).map(f => ({ type: 'input_file', filename: f.filename, file_data: f.dataUrl })))
+        : m.content }));
     const mk = input => JSON.stringify({ model: route.model || 'gpt-6-1-terra', instructions: sys, input, reasoning: { effort: route.effort || 'low' }, stream: false });
     let res = await HDA.fetchTimeout(route.url, { method: 'POST', headers, body: mk(conv) }, 90000, signal);
     let raw = await res.text();
@@ -139,7 +169,7 @@ HDA.callRoute = async function (route, messages, signal) {
     const text = messages.map(m => (m.role === 'system' ? '### HỆ THỐNG\n' : m.role === 'assistant' ? '### HUYỀN (trả lời trước)\n' : '### NGƯỜI DÙNG / KẾT QUẢ CÔNG CỤ\n') + m.content).join('\n\n');
     body = { model: route.model || 'deepseek-v4-1-flash', stream: false, thinking: { type: 'disabled' }, input: [{ role: 'user', content: [{ type: 'input_text', text }] }] };
   } else {
-    body = { messages: messages.map(m => ({ role: m.role, content: m.content })), stream: false };
+    body = { messages: messages.map(m => ({ role: m.role, content: m.images && m.images.length ? [{ type: 'text', text: String(m.content) }].concat(m.images.map(u => ({ type: 'image_url', image_url: { url: u } }))) : m.content })), stream: false };
     if (route.model) body.model = route.model;
   }
   const res = await HDA.fetchTimeout(route.url, { method: 'POST', headers, body: JSON.stringify(body) }, 90000, signal);

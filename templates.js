@@ -67,7 +67,11 @@ function hdaFillTemplate(t, v) {
     KH: v.KH || '(khách hàng)',
     KY: v.KY || 'trong kỳ hiện tại (tháng này)',
     TUAN: v.TUAN || 'tuần này',
-    EXCEL: v.EXCEL ? ' Xuất file Excel danh sách kết quả.' : ''
+    EXCEL: v.EXCEL ? ' Xuất file Excel danh sách kết quả.' : '',
+    SP: v.SP || '(tên sản phẩm, cách nhau dấu phẩy)',
+    NHOM: v.NHOM || '(nhóm / danh mục)',
+    MUC: v.MUC === '0' ? 'đầy đủ mức giá' : v.MUC === '6' ? 'mua từ 6 hộp' : 'mua từ 12 hộp trở lên',
+    MSG: v.MSG ? ', tin nhắn: ' + v.MSG : ''
   };
-  return String(t.text).replace(/\{(NV|KH|KY|TUAN|EXCEL)\}/g, (_, k) => map[k]);
+  return String(t.text).replace(/\{(NV|KH|KY|TUAN|EXCEL|SP|NHOM|MUC|MSG)\}/g, (_, k) => map[k]);
 }
